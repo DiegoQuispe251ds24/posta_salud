@@ -26,8 +26,17 @@
         <p>Este paciente no tiene citas registradas.</p>
     @endforelse
 
-    <div class="acciones">
+<div class="acciones">
         <a href="{{ route('pacientes.edit', $paciente) }}" role="button">Editar</a>
+
+        <form method="POST" action="{{ route('pacientes.destroy', $paciente) }}"
+              onsubmit="return confirm('¿Seguro que deseas eliminar este paciente?');"
+              style="margin: 0;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="secondary">Eliminar</button>
+        </form>
+
         <a href="{{ route('pacientes.index') }}">Volver al listado</a>
     </div>
 @endsection

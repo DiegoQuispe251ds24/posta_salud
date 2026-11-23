@@ -65,6 +65,14 @@ class PacienteController extends Controller
 
     public function destroy(Paciente $paciente)
     {
-        //
+        if ($paciente->citas()->exists() || $paciente->atenciones()->exists()) {
+            return back()->with('error',
+                'No se puede eliminar: el paciente tiene citas o atenciones registradas.');
+        }
+
+        $paciente->delete();
+
+        return redirect()->route('pacientes.index')
+            ->with('ok', 'Paciente eliminado correctamente.');
     }
 }
