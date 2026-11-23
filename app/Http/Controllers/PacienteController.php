@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Paciente;
 use App\Http\Requests\StorePacienteRequest;
 use App\Http\Requests\UpdatePacienteRequest;
+use App\Models\Paciente;
+use Illuminate\Http\Request;
 
 class PacienteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-   public function index(Request $request)
+    public function index(Request $request)
     {
         $buscar = trim($request->input('buscar', ''));
 
@@ -29,9 +26,6 @@ class PacienteController extends Controller
         return view('pacientes.index', compact('pacientes', 'buscar'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         return view('pacientes.create', ['paciente' => new Paciente()]);
@@ -39,38 +33,36 @@ class PacienteController extends Controller
 
     public function store(StorePacienteRequest $request)
     {
-        Paciente::create($request->validated());
+        $paciente = Paciente::create($request->validated());
 
-        return redirect()->route('pacientes.index')
+        return redirect()->route('pacientes.show', $paciente)
             ->with('ok', 'Paciente registrado correctamente.');
     }
-    /**
-     * Display the specified resource.
-     */
+
     public function show(Paciente $paciente)
     {
-        //
+        $citas = $paciente->citas()
+            ->with('personalMedico')
+            ->latest('fecha_hora')
+            ->take(5)
+            ->get();
+
+        return view('pacientes.show', compact('paciente', 'citas'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Paciente $paciente)
     {
-        //
+        return view('pacientes.edit', compact('paciente'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdatePacienteRequest $request, Paciente $paciente)
     {
-        //
+        $paciente->update($request->validated());
+
+        return redirect()->route('pacientes.show', $paciente)
+            ->with('ok', 'Datos del paciente actualizados.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Paciente $paciente)
     {
         //
